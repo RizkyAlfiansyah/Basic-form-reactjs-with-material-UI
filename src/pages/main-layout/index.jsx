@@ -1,5 +1,6 @@
-import React, {useState, useRef} from 'react'
-import { Box, Grid, Typography , Divider} from '@mui/material';
+import React, {useState, useRef, useEffect} from 'react'
+import { Box, Grid, Typography , Divider, OutlinedInput, InputAdornment, Button} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import Style from './styles.module.scss'
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -35,9 +36,15 @@ const MainLayout = () => {
         unit: 1,
         qty: 1,
         price: 700000,
-        totalPrice: 700000,
-        totalNetPrice: 700000,
+        totalPrice: 0,
     })
+
+    useEffect(() => {
+        setProduct({
+            ...product,
+            totalPrice: product.qty * product.price,
+        })
+    } , [product.qty, product.price, detail.notes])
 
     const fetchHighlightedDays = (date) => {
         const controller = new AbortController();
@@ -186,7 +193,18 @@ const MainLayout = () => {
                 <Grid item xs={9} style={{ width: '100%' }}>
                     <FormControl fullWidth sx={{ m: 1 }}>
                         <Typography variant='subtitle2' style={{fontWeight: '500'}}>Notes</Typography>
-                        <input type="text" className={input} />
+                        <TextField
+                            id="outlined-multiline-static"
+                            multiline
+                            rows={4}
+                            defaultValue={detail.notes}
+                            onChange={(v) => {
+                                setDetail({
+                                    ...detail,
+                                    notes: v.target.value,
+                                });
+                            }}
+                        />
                     </FormControl>
                 </Grid>
             </Grid>
@@ -200,7 +218,7 @@ const MainLayout = () => {
                     Products
                 </Typography>
             </Grid>
-            <Grid container xs>
+            <Grid item xs>
                 <Grid item xs={10} className={form}>
                     <Grid container spacing={2} style={{ padding: '0px' }}>
                         <Grid item xs={9} style={{ width: '100%' }}>
@@ -278,23 +296,39 @@ const MainLayout = () => {
                         <Grid item xs style={{ width: '100%' }}>
                             <FormControl fullWidth sx={{ m: 1 }}>
                                     <Typography variant='subtitle2' style={{fontWeight: '500', textAlign: 'right'}}>Total Price <span style={{ color: 'red' }}>*</span></Typography>
-                                    <TextField fullWidth disabled
-                                        value={product.totalNetPrice}
-                                        onChange={(v) => {
-                                        setProduct({
-                                            ...product,
-                                            totalNetPrice: v.target.value,
-                                        });
+                                    <OutlinedInput
+                                        disabled
+                                        id="outlined-adornment-weight"
+                                        value=""
+                                        endAdornment={<InputAdornment position="end">{product.totalPrice}</InputAdornment>}
+                                        aria-describedby="outlined-weight-helper-text"
+                                        inputProps={{
+                                        'aria-label': 'weight',
                                         }}
-                                        sx={{textAlign: 'right', backgroundColor: '#f5f5f5'}}
                                     />
                             </FormControl>
+                            <hr />
+                            <Grid container style={{justifyContent: 'space-between'}}>
+                                <Typography variant='subtitle1' style={{fontWeight: '700', textAlign: 'left'}}>Total Nett Price</Typography>
+                                <Typography variant='subtitle1' style={{fontWeight: '700', textAlign: 'right'}}>{product.totalPrice}</Typography>
+                            </Grid>
                         </Grid>
+                    </Grid>
+                    <Button variant="contained" endIcon={<AddIcon />} style={{backgroundColor : "#FFD24C"}}>
+                        NEW ITEM
+                    </Button>
+                    <Grid container style={{justifyContent: 'flex-end', gap: '220px'}}>
+                        <Typography variant='subtitle1' style={{fontWeight: '700', textAlign: 'left'}}>Total</Typography>
+                        <Typography variant='subtitle1' style={{fontWeight: '700', textAlign: 'right'}}>{product.totalPrice}</Typography>
                     </Grid>
                 </Grid>
             </Grid>
         </Grid>
-        <Divider style={{marginTop : '20px'}} />
+        <Divider style={{margin : '20px 0px'}} />
+        <Grid container style={{justifyContent: 'flex-end', gap: '20px'}}>
+            <Button size="medium" style={{color: '#000', fontWeight: '600'}}>Cancel</Button>
+            <Button variant="contained" size="medium" style={{backgroundColor : "#4E944F", color: '#fff', fontWeight: '600'}}> Confirm</Button>
+        </Grid>
        </div>
     </Box>
   )
